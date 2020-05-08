@@ -4,8 +4,12 @@
   "description": "Expense Reimbursement API",
   "main": "./build/index.js",
   "scripts": {
-    "test": "jest",
-    "start": "tsc && node ./build/index.js"
+    "start": "node ./build/index.js",
+    "dev-start": "tsc && node ./build/index.js",
+    "test": "jest --no-cache",
+    "coverage": "jest --coverage --no-cache",
+    "watch-tests": "jest --watch --no-cache",
+    "build": "tsc"
   },
   "author": "Juan Valencia",
   "license": "ISC",
