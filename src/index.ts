@@ -6,6 +6,7 @@ import path from 'path';
 import { sessionMiddleware } from './middleware/session-middleware';
 import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
+import { UserRouter } from './routers/user-router';
 
 // environment configuration
 dotenv.config();
@@ -30,7 +31,7 @@ app.use(morgan('combined', { stream: logStream }));
 app.use(sessionMiddleware);
 app.use(corsFilter);
 app.use('/', express.json());
-//app.use('/users', UserRouter);
+app.use('/users', UserRouter);
 
 
 app.listen(8080, () => {
