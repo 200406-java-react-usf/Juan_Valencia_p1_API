@@ -1,4 +1,4 @@
-export interface UserSchema {
+export interface EmployeeSchema {
     ers_user_id: number,
     username: string,
     password: string,

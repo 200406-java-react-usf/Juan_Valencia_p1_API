@@ -1,4 +1,4 @@
-import { User } from '../models/user';
+import { Employee } from '../models/employee';
 import { CrudRepository } from './crud-repo';
 import {
     NotImplementedError, 
@@ -8,9 +8,9 @@ import {
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
-import { mapUserResultSet } from '../util/result-set-mapper';
+import { mapEmployeeResultSet } from '../util/result-set-mapper';
 
-export class UserRepository implements CrudRepository<User> {
+export class EmployeeRepository implements CrudRepository<Employee> {
 
     baseQuery = `
         select
@@ -26,7 +26,7 @@ export class UserRepository implements CrudRepository<User> {
         on eu.user_role_id = ur.role_id
     `;
 
-    async getById(id: number): Promise<User> {
+    async getById(id: number): Promise<Employee> {
 
         let client: PoolClient;
 
@@ -34,7 +34,7 @@ export class UserRepository implements CrudRepository<User> {
             client = await connectionPool.connect();
             let sql = `${this.baseQuery} where eu.ers_user_id = $1`;
             let rs = await client.query(sql, [id]);
-            return mapUserResultSet(rs.rows[0]);
+            return mapEmployeeResultSet(rs.rows[0]);
         } catch (e) {
             throw new InternalServerError();
         } finally {
@@ -42,6 +42,23 @@ export class UserRepository implements CrudRepository<User> {
         }
     
 
+    }
+
+    async getEmployeeByCredentials(un: string, pw: string) {
+        
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where eu.username = $1 and eu.password = $2`;
+            let rs = await client.query(sql, [un, pw]);
+            return mapEmployeeResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    
     }
 
 }

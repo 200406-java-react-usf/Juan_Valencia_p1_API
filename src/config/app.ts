@@ -1,10 +1,10 @@
-import { UserRepository } from "../repos/user-repo";
-import { UserService } from "../services/user-service";
+import { EmployeeRepository } from "../repos/employee-repo";
+import { EmployeeService } from "../services/employee-service";
 
-const userRepo = new UserRepository();
-const userService = new UserService(userRepo);
+const employeeRepo = new EmployeeRepository();
+const employeeService = new EmployeeService(employeeRepo);
 
 
 export default {
-    userService
+    employeeService
 }

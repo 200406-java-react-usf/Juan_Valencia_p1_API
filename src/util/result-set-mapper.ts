@@ -1,13 +1,13 @@
-import { UserSchema } from "./schemas";
-import { User } from "../models/user";
+import { EmployeeSchema } from "./schemas";
+import { Employee } from "../models/employee";
 
-export function mapUserResultSet(resultSet: UserSchema): User {
+export function mapEmployeeResultSet(resultSet: EmployeeSchema): Employee {
     
     if (!resultSet) {
-        return {} as User;
+        return {} as Employee;
     }
 
-    return new User(
+    return new Employee(
         resultSet.ers_user_id,
         resultSet.username,
         resultSet.password,
