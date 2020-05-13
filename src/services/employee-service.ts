@@ -74,7 +74,6 @@ export class EmployeeService {
             throw new  ResourcePersistenceError('The provided email is already taken.');
         }
 
-        newEmployee.role = 'User'; // all new registers have 'User' role by default
         const persistedUser = await this.employeeRepo.save(newEmployee);
 
         return this.removePassword(persistedUser);
