@@ -16,3 +16,15 @@ EmployeeRouter.get('/:id', adminGuard, async (req, resp) => {
         return resp.status(e.statusCode).json(e);
     }
 });
+
+EmployeeRouter.post('', async (req, resp) => {
+
+    console.log('POST REQUEST RECEIVED AT /users');
+    console.log(req.body);
+    try {
+        let newUser = await employeeService.addNewEmployee(req.body);
+        return resp.status(201).json(newUser);
+    } catch (e) {
+        return resp.status(e.statusCode).json(e);
+    }
+});

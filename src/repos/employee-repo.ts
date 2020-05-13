@@ -44,7 +44,7 @@ export class EmployeeRepository implements CrudRepository<Employee> {
 
     }
 
-    async getEmployeeByCredentials(un: string, pw: string) {
+    async getEmployeeByCredentials(un: string, pw: string): Promise<Employee> {
         
         let client: PoolClient;
 
@@ -61,4 +61,55 @@ export class EmployeeRepository implements CrudRepository<Employee> {
     
     }
 
+    async save(newEmployee: Employee): Promise<Employee> {
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+
+            // WIP: hacky fix since we need to make two DB calls
+            let roleId = (await client.query('select role_id from ers_user_roles where role_name = $1', [newEmployee.role])).rows[0].userId;
+            
+            let sql = `
+                insert into ers_users (username, password, first_name, last_name, email, user_role_id) 
+                values ($1, $2, $3, $4, $5, $6) returning id
+            `;
+
+            let rs = await client.query(sql, [newEmployee.username, newEmployee.password, newEmployee.firstName, newEmployee.lastName, newEmployee.email, roleId]);
+            
+            newEmployee.userId = rs.rows[0].userId;
+            
+            return newEmployee;
+
+        } catch (e) {
+            console.log(e);
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
+
+    async update(updateEmployee: Employee): Promise<boolean> {
+        return
+    }
+
+    async getEmployeeByUniqueKey(key: string, val: string): Promise<Employee> {
+
+        let client: PoolClient;
+
+        try {
+
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery} where eu.${key} = $1`;
+            let rs = await client.query(sql, [val]);
+            console.log(rs.rows);
+            return mapEmployeeResultSet(rs.rows[0]);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+        
+    
+    }
 }
