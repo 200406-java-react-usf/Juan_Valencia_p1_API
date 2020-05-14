@@ -3,8 +3,7 @@ import { EmployeeRepository } from "../repos/employee-repo";
 import { isValidId, isValidStrings, isValidObject, isPropertyOf, isEmptyObject } from "../util/validator";
 import { 
     BadRequestError, 
-    ResourceNotFoundError, 
-    NotImplementedError, 
+    ResourceNotFoundError,
     ResourcePersistenceError, 
     AuthenticationError 
 } from "../errors/errors";
@@ -14,6 +13,19 @@ export class EmployeeService {
 
     constructor(private employeeRepo: EmployeeRepository) {
         this.employeeRepo = employeeRepo;
+    }
+
+    async getAllEmployees(): Promise<Employee[]> {
+
+        let employees = await this.employeeRepo.getAll();
+
+        if (employees.length == 0) {
+            throw new ResourceNotFoundError();
+        }
+
+        return employees.map(this.removePassword);
+
+
     }
 
     async getEmployeeById(id: number): Promise<Employee> {
@@ -80,7 +92,29 @@ export class EmployeeService {
     }
 
     async updateEmployee(updateEmployee: Employee): Promise<boolean> {
-        return
+
+        if (!isValidObject(updateEmployee)) {
+            throw new BadRequestError('Invalid user provided (invalid values found).');
+
+        }
+
+        let queryKeys = Object.keys(updateEmployee);
+
+        if (!queryKeys.every(key => isPropertyOf(key, Employee))) {
+            throw new BadRequestError();
+        }
+
+        let emailAvailable = await this.isEmailAvailable(updateEmployee.email, updateEmployee.username);
+
+        if (!emailAvailable) {
+            throw new  ResourcePersistenceError('The provided email is already taken.');
+        }
+        
+        if(!(queryKeys.length === 5)){
+            throw new BadRequestError();
+        }
+
+        return await this.employeeRepo.update(updateEmployee);
     }
 
     async getEmployeeByUniqueKey(queryObj: any): Promise<Employee> {
@@ -142,9 +176,17 @@ export class EmployeeService {
 
     }
 
-    private async isEmailAvailable(email: string): Promise<boolean> {
+    private async isEmailAvailable(email: string, username?: string): Promise<boolean> {
         
         try {
+            if(username){
+                let self = await this.getEmployeeByUniqueKey({'username': username});
+                if(self.email === email){
+                    console.log('username owns this email ')
+                    return true;
+                }
+            }
+            
             await this.getEmployeeByUniqueKey({'email': email});
         } catch (e) {
             console.log('email is available')

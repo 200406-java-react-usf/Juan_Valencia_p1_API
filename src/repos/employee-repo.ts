@@ -26,6 +26,23 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         on eu.user_role_id = ur.role_id
     `;
 
+    async getAll(): Promise<Employee[]> {
+
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `${this.baseQuery}`;
+            let rs = await client.query(sql); 
+            return rs.rows.map(mapEmployeeResultSet);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+
+    }
+
     async getById(id: number): Promise<Employee> {
 
         let client: PoolClient;
@@ -89,7 +106,18 @@ export class EmployeeRepository implements CrudRepository<Employee> {
     }
 
     async update(updateEmployee: Employee): Promise<boolean> {
-        return
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = 'update ers_users set password = $1 , first_name = $2, last_name = $3, email = $4 where username = $5 ;';
+            await client.query(sql, [ updateEmployee.password, updateEmployee.firstName, updateEmployee.lastName, updateEmployee.email, updateEmployee.username ]);
+            return true;
+        } catch (e) {
+            throw new InternalServerError(e);
+        } finally {
+            client && client.release();
+        }
     }
 
     async getEmployeeByUniqueKey(key: string, val: string): Promise<Employee> {
