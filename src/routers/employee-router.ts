@@ -2,6 +2,7 @@ import url from 'url';
 import express from 'express';
 import AppConfig from '../config/app';
 import { adminGuard } from '../middleware/auth-middleware';
+import { AuthorizationError } from '../errors/errors';
 
 export const EmployeeRouter = express.Router();
 
@@ -51,4 +52,22 @@ EmployeeRouter.put('', adminGuard, async (req, resp) => {
         return resp.status(e.statusCode).json(e).send();
     }
 
+});
+
+EmployeeRouter.delete('', adminGuard, async (req, resp) => {
+
+    console.log('DELETE REQUEST RECEIVED AT /users');
+    console.log(req.body);
+    try {
+        if(req.body.id == 1){
+            throw new AuthorizationError();
+        }
+        await employeeService.deleteById(+req.body.id);
+        resp.sendStatus(204);
+
+    }
+    catch(e){
+        resp.status(e.statusCode).json(e).send();
+    }
+    //resp.send();
 });

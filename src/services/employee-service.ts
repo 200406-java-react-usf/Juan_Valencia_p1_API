@@ -117,6 +117,23 @@ export class EmployeeService {
         return await this.employeeRepo.update(updateEmployee);
     }
 
+    async deleteById(id: number): Promise<boolean> {
+
+        if (!isValidId(id)) {
+            throw new BadRequestError();
+        }
+
+        let employee = await this.employeeRepo.getById(id);
+
+        if (isEmptyObject(employee)) {
+            throw new ResourceNotFoundError();
+        }
+        let isDeleted = await this.employeeRepo.deleteById(employee.userId);
+
+        return isDeleted;
+
+    }
+
     async getEmployeeByUniqueKey(queryObj: any): Promise<Employee> {
 
         // we need to wrap this up in a try/catch in case errors are thrown for our awaits

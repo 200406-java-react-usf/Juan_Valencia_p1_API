@@ -1,9 +1,6 @@
 import { Employee } from '../models/employee';
 import { CrudRepository } from './crud-repo';
 import {
-    NotImplementedError, 
-    ResourceNotFoundError, 
-    ResourcePersistenceError,
     InternalServerError
 } from '../errors/errors';
 import { PoolClient } from 'pg';
@@ -138,5 +135,21 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         }
         
     
+    }
+
+    async deleteById(id: number): Promise<boolean> {
+
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = 'delete from ers_users where ers_user_id = $1 ';
+            await client.query(sql, [id]);
+            return true;
+        } catch (e) {
+            throw new InternalServerError(e);
+        } finally {
+            client && client.release();
+        }
     }
 }
