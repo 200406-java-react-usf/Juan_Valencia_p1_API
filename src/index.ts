@@ -8,6 +8,7 @@ import { corsFilter } from './middleware/cors-filter';
 import { Pool } from 'pg';
 import { EmployeeRouter } from './routers/employee-router';
 import { AuthRouter } from './routers/auth-router';
+import { ReimbRouter } from './routers/reimb-router';
 
 // environment configuration
 dotenv.config();
@@ -33,6 +34,7 @@ app.use(sessionMiddleware);
 app.use(corsFilter);
 app.use('/', express.json());
 app.use('/employees', EmployeeRouter);
+app.use('/reimb', ReimbRouter);
 app.use('/auth', AuthRouter);
 
 

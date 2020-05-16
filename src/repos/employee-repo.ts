@@ -33,7 +33,7 @@ export class EmployeeRepository implements CrudRepository<Employee> {
             let rs = await client.query(sql); 
             return rs.rows.map(mapEmployeeResultSet);
         } catch (e) {
-            throw new InternalServerError();
+            throw new InternalServerError(e);
         } finally {
             client && client.release();
         }

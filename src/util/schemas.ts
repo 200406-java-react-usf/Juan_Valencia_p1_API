@@ -16,6 +16,6 @@ export interface ReimbSchema {
     description: string,
     author: string,
     resolver: string,
-    reimb_status: string,
-    reimb_type: string
+    status: string,
+    type: string
 }

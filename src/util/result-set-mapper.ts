@@ -33,7 +33,15 @@ export function mapReimbResultSet(resultSet: ReimbSchema): Reimbursement {
         resultSet.description,
         resultSet.author,
         resultSet.resolver,
-        resultSet.reimb_status,
-        resultSet.reimb_type
+        resultSet.status,
+        resultSet.type
     );
+}
+
+export function mapTypeResultSet(resultSet) {
+    if(!resultSet){
+        return {};
+    }
+
+    return resultSet.reimb_type;
 }

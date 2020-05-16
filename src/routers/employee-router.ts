@@ -58,9 +58,6 @@ EmployeeRouter.delete('', adminGuard, async (req, resp) => {
     console.log('DELETE REQUEST RECEIVED AT /users');
     console.log(req.body);
     try {
-        if(req.body.id == 1){
-            throw new AuthorizationError();
-        }
         await employeeService.deleteById(+req.body.id);
         resp.sendStatus(204);
 
