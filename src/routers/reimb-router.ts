@@ -10,7 +10,7 @@ const reimbService = AppConfig.reimbService;
 /**
  * Get all Reimbursements(Only visible to finance manager)
  */
-ReimbRouter.get('', fmGuard, async (req, resp) => {
+ReimbRouter.get('/fm', fmGuard, async (req, resp) => {
     try {
 
             let payload = await reimbService.getAllReimb();
@@ -24,7 +24,7 @@ ReimbRouter.get('', fmGuard, async (req, resp) => {
 /**
  * Get Reimbursements by Status(Only visible to finance manager)
  */
-ReimbRouter.get('/status/:status', fmGuard, async (req, resp) => {
+ReimbRouter.get('/fm/status/:status', fmGuard, async (req, resp) => {
     const status = req.params.status;
     console.log(status);
     try {
@@ -39,7 +39,7 @@ ReimbRouter.get('/status/:status', fmGuard, async (req, resp) => {
 /**
  * Get Reimbursements by Type(Only visible to finance manager)
  */
-ReimbRouter.get('/type/:type', fmGuard, async (req, resp) => {
+ReimbRouter.get('/fm/type/:type', fmGuard, async (req, resp) => {
     const type = req.params.type;
     try {
         let payload = await reimbService.getReimbByType(type);
@@ -52,9 +52,9 @@ ReimbRouter.get('/type/:type', fmGuard, async (req, resp) => {
 /**
  * Resolve Reimbursements (Only visible to Finance managers)
  */
-ReimbRouter.put('', fmGuard, async (req, resp) => {
+ReimbRouter.put('/fm', fmGuard, async (req, resp) => {
 
-    console.log('PUT REQUEST RECEIVED AT /users');
+    console.log('PUT REQUEST RECEIVED AT /reimb');
     console.log(req.body);
     try {
         let newUser = await reimbService.resolveReimb(req.body);
@@ -81,7 +81,7 @@ ReimbRouter.get('/:id', generalGuard, async (req, resp) => {
 /**
  * Get Reimbursements by AuthorID (Only visible to Employees)
  */
-ReimbRouter.get('/author/:id', userGuard, async (req, resp) => {
+ReimbRouter.get('/employee/:id', userGuard, async (req, resp) => {
     const id = +req.params.id;
     try {
         let payload = await reimbService.getReimbByAuthorId(id);
@@ -94,9 +94,9 @@ ReimbRouter.get('/author/:id', userGuard, async (req, resp) => {
 /**
  * Add Reimbursements (Only visible to Employees)
  */
-ReimbRouter.post('', userGuard, async (req, resp) => {
+ReimbRouter.post('/employee', userGuard, async (req, resp) => {
 
-    console.log('POST REQUEST RECEIVED AT /users');
+    console.log('POST REQUEST RECEIVED AT /reimb');
     console.log(req.body);
     try {
         let newUser = await reimbService.addNewReimb(req.body);
@@ -111,7 +111,7 @@ ReimbRouter.post('', userGuard, async (req, resp) => {
  */
 ReimbRouter.put('/employee', userGuard, async (req, resp) => {
 
-    console.log('PUT REQUEST RECEIVED AT /users');
+    console.log('PUT REQUEST RECEIVED AT /reimb/employee');
     console.log(req.body);
     try {
         let newUser = await reimbService.updateReimb(req.body);

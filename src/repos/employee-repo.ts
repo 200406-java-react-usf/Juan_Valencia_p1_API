@@ -81,9 +81,6 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         try {
             client = await connectionPool.connect();
 
-            // WIP: hacky fix since we need to make two DB calls
-            //let roleId = (await client.query('select role_id from ers_user_roles where role_name = $1', [newEmployee.role])).rows[0].role_id;
-            console.log(newEmployee.role);
             let sql = `
                 insert into ers_users (username, password, first_name, last_name, email, user_role_id) 
                 values ($1, $2, $3, $4, $5, ( select role_id from ers_user_roles where role_name = $6 ) );
@@ -95,7 +92,6 @@ export class EmployeeRepository implements CrudRepository<Employee> {
             return newEmployee;
 
         } catch (e) {
-            console.log(e);
             throw new InternalServerError();
         } finally {
             client && client.release();

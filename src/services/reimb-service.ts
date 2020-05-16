@@ -94,14 +94,66 @@ export class ReimbService {
     }
 
     async addNewReimb(newReimb: Reimbursement): Promise<Reimbursement> {
-        return
+
+        if (!isValidObject(newReimb)) {
+            throw new BadRequestError('Invalid property values found in provided user.');
+        }
+
+        if(newReimb.amount <= 0){
+            throw new BadRequestError('Invalid amount value found.');
+        }
+
+        if(!isValidStrings(newReimb.description)){
+            throw new BadRequestError('Invalid description value found.')
+        }
+
+        //Getting the author id
+        let authorId = await this.reimbRepo.getByUsername(newReimb.author);
+
+        if(!isValidId(authorId)){
+            throw new ResourceNotFoundError('ID by username was not found');
+        }
+
+        let reimbTypes = await this.reimbRepo.getTypes();
+        if(!reimbTypes.includes(newReimb.reimbType)){
+            throw new BadRequestError('Type not valid');
+        }
+        
+        newReimb.status = 'Pending';
+
+
+        let persistedReimb = await this.reimbRepo.save(newReimb, authorId);
+
+        return persistedReimb;
+
     }
 
     async updateReimb(updateReimb: Reimbursement): Promise<boolean> {
-        return
+
+        if (!isValidObject(updateReimb)) {
+            throw new BadRequestError('Invalid user provided (invalid values found).');
+        }
+
+        let queryKeys = Object.keys(updateReimb);
+        if (!queryKeys.every(key => isPropertyOf(key, Reimbursement))) {
+            throw new BadRequestError();
+        }
+        
+        if(updateReimb.status !== 'Pending'){
+            throw new ResourcePersistenceError('The Reimbursement was already processed.');
+        }
+
+        return await this.reimbRepo.update(updateReimb);
     }
 
     async resolveReimb(resolvedReimb: Reimbursement): Promise<boolean> {
+
+        if(resolvedReimb.status === 'Pending'){
+            throw new ResourcePersistenceError('Can only be updated to Denied or Approved');
+        }
+
+        return await this.reimbRepo.resolve(resolvedReimb);
+
         return
     }
 

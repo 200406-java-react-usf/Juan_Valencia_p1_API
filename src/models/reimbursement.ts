@@ -7,7 +7,7 @@ export class Reimbursement {
     author: string;
     resolver: string;
     status: string;
-    reimType: string;
+    reimbType: string;
 
     constructor(id: number, amnt: number, subm: Date, resolved: Date, desc: string, author: string, resolver: string, status: string, reimtype: string){
         this.reimId = id;
@@ -18,6 +18,6 @@ export class Reimbursement {
         this.author = author;
         this.resolver = resolver;
         this.status = status;
-        this.reimType = reimtype; 
+        this.reimbType = reimtype; 
     }
 }

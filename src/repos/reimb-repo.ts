@@ -57,6 +57,21 @@ export class ReimbRepository {
         }
     }
 
+    async getByUsername(username: string): Promise<number> {
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `select ers_user_id from ers_users where username = $1;`;
+            let rs = await client.query(sql,[username]); 
+            return rs.rows[0].ers_user_id;
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+    }
+
     async getReimbsByType(type: string): Promise<Reimbursement[]> {
         let client: PoolClient;
 
@@ -123,6 +138,63 @@ export class ReimbRepository {
         }
     
 
+    }
+
+    async save(newReimb: Reimbursement,authorId: number): Promise<Reimbursement> {
+        
+        let client: PoolClient;
+
+        try{
+
+            client = await connectionPool.connect();
+            let sql = `insert into ers_reimbursements (amount, description, author_id, reimb_status_id, reimb_type_id )
+                    values ( $1 , $2 , $3 , 
+                    (select rs.reimb_status_id from ers_reimbursement_statuses rs where rs.reimb_status = $4) , 
+                    (select rt.reimb_type_id from ers_reimbursement_types rt where rt.reimb_type = $5));`;
+            
+            let rs = await client.query(sql, [newReimb.amount, newReimb.description, authorId, newReimb.status, newReimb.reimbType])
+            console.log(rs.rows[0]);
+            return mapReimbResultSet(rs.rows[0]);
+        }
+        catch(e){
+            console.log(e);
+            throw new InternalServerError();
+        }
+        finally {
+            client && client.release();
+        }
+    }
+
+    async update(updateReimb: Reimbursement): Promise<boolean> {
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `update ers_reimbursements set amount = $1 , description = $2, 
+                reimb_type_id = (select rt.reimb_type_id from ers_reimbursement_types rt where rt.reimb_type = $3) where reimb_id = $4 ;`;
+            await client.query(sql, [ updateReimb.amount, updateReimb.description, updateReimb.reimbType, updateReimb.reimId]);
+            return true;
+        } catch (e) {
+            throw new InternalServerError(e);
+        } finally {
+            client && client.release();
+        }
+    }
+
+    async resolve(resolveReimb: Reimbursement): Promise<boolean> {
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `update ers_reimbursements set amount = 
+            (select rs.reimb_status_id from ers_reimbursement_statuses rs where rs.reimb_status = $1) , where reimb_id = $2 ;`;
+            await client.query(sql, [ resolveReimb.status, resolveReimb.reimId]);
+            return true;
+        } catch (e) {
+            throw new InternalServerError(e);
+        } finally {
+            client && client.release();
+        }
     }
 
 }
