@@ -70,10 +70,17 @@ export class EmployeeService {
     }
 
     async addNewEmployee(newEmployee: Employee): Promise<Employee> {
-        if (!isValidObject(newEmployee, 'id')) {
+
+        
+        
+        if (!isValidObject(newEmployee)) {
             throw new BadRequestError('Invalid property values found in provided user.');
         }
-
+        // let empRoles = await this.employeeRepo.getRoles();
+        // console.log(empRoles);
+        //         if(empRoles.includes(newEmployee.role)){
+        //             throw new BadRequestError('Role is not valid');
+        //         }
         let usernameAvailable = await this.isUsernameAvailable(newEmployee.username);
 
         if (!usernameAvailable) {
@@ -93,6 +100,14 @@ export class EmployeeService {
 
     async updateEmployee(updateEmployee: Employee): Promise<boolean> {
 
+        if(updateEmployee.password === ''){
+            let olduser = await this.employeeRepo.getEmployeeByUniqueKey("username", updateEmployee.username);
+            if(isEmptyObject(olduser)){
+                throw new ResourceNotFoundError("Username not found");
+            }
+            updateEmployee.password = olduser.password;
+        }
+
         if (!isValidObject(updateEmployee)) {
             throw new BadRequestError('Invalid user provided (invalid values found).');
 
@@ -110,9 +125,13 @@ export class EmployeeService {
             throw new  ResourcePersistenceError('The provided email is already taken.');
         }
         
-        if(!(queryKeys.length === 5)){
-            throw new BadRequestError();
-        }
+        // if(!(queryKeys.length === 5)){
+        //     throw new BadRequestError();
+        // }
+
+        
+        
+        
 
         return await this.employeeRepo.update(updateEmployee);
     }
@@ -179,7 +198,7 @@ export class EmployeeService {
         return emply;   
     }
 
-    private async isUsernameAvailable(username: string): Promise<boolean> {
+     async isUsernameAvailable(username: string): Promise<boolean> {
 
         try {
             await this.getEmployeeByUniqueKey({'username': username});
@@ -193,7 +212,7 @@ export class EmployeeService {
 
     }
 
-    private async isEmailAvailable(email: string, username?: string): Promise<boolean> {
+     async isEmailAvailable(email: string, username?: string): Promise<boolean> {
         
         try {
             if(username){

@@ -1,5 +1,5 @@
 export class Reimbursement {
-    reimId: number;
+    reimbId: number;
     amount: number;
     submitted: Date;
     resolved: Date;
@@ -10,7 +10,7 @@ export class Reimbursement {
     reimbType: string;
 
     constructor(id: number, amnt: number, subm: Date, resolved: Date, desc: string, author: string, resolver: string, status: string, reimtype: string){
-        this.reimId = id;
+        this.reimbId = id;
         this.amount = amnt;
         this.submitted = subm;
         this.resolved = resolved;

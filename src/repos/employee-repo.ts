@@ -5,7 +5,7 @@ import {
 } from '../errors/errors';
 import { PoolClient } from 'pg';
 import { connectionPool } from '..';
-import { mapEmployeeResultSet } from '../util/result-set-mapper';
+import { mapEmployeeResultSet, mapTypeResultSet } from '../util/result-set-mapper';
 
 export class EmployeeRepository implements CrudRepository<Employee> {
 
@@ -96,6 +96,23 @@ export class EmployeeRepository implements CrudRepository<Employee> {
         } finally {
             client && client.release();
         }
+    }
+
+    async getRoles(): Promise<any[]> {
+
+        let client: PoolClient;
+
+        try {
+            client = await connectionPool.connect();
+            let sql = `select role_name from ers_user_roles ;`;
+            let rs = await client.query(sql); 
+            return rs.rows.map(mapTypeResultSet);
+        } catch (e) {
+            throw new InternalServerError();
+        } finally {
+            client && client.release();
+        }
+
     }
 
     async update(updateEmployee: Employee): Promise<boolean> {

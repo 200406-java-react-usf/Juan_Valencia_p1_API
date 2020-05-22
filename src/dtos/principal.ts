@@ -1,10 +1,10 @@
 export class Principal {
-    id: number;
+    userId: number;
     username: string;
     role: string;
 
     constructor(id: number, un: string, role: string) {
-        this.id = id;
+        this.userId = id;
         this.username = un;
         this.role = role;
     }

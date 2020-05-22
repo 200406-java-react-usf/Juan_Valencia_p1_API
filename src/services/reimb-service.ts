@@ -28,40 +28,40 @@ export class ReimbService {
 
     }
 
-    async getReimbByStatus(status: string): Promise<Reimbursement[]> {
+    // async getReimbByStatus(status: string): Promise<Reimbursement[]> {
         
-        if(!['Pending','Approved','Denied'].includes(status)){
-            throw new BadRequestError();
-        }
+    //     if(!['Pending','Approved','Denied'].includes(status)){
+    //         throw new BadRequestError();
+    //     }
 
-        let reimbs = await this.reimbRepo.getReimbsByStatus(status);
+    //     let reimbs = await this.reimbRepo.getReimbsByStatus(status);
 
-        if(reimbs.length === 0){
-            throw new ResourceNotFoundError();
-        }
+    //     if(reimbs.length === 0){
+    //         throw new ResourceNotFoundError();
+    //     }
 
-        return reimbs;
-    }
+    //     return reimbs;
+    // }
 
-    async getReimbByType(type: string): Promise<Reimbursement[]> {
+    // async getReimbByType(type: string): Promise<Reimbursement[]> {
 
-        if(!isValidStrings(type)){
-            throw new BadRequestError();
-        }
+    //     if(!isValidStrings(type)){
+    //         throw new BadRequestError();
+    //     }
 
-        let reimbTypes = await this.reimbRepo.getTypes();
-        if(!reimbTypes.includes(type)){
-            throw new BadRequestError('Type not valid');
-        }
+    //     let reimbTypes = await this.reimbRepo.getTypes();
+    //     if(!reimbTypes.includes(type)){
+    //         throw new BadRequestError('Type not valid');
+    //     }
 
-        let reimbs = await this.reimbRepo.getReimbsByType(type);
+    //     let reimbs = await this.reimbRepo.getReimbsByType(type);
 
-        if(reimbs.length === 0){
-            throw new ResourceNotFoundError();
-        }
+    //     if(reimbs.length === 0){
+    //         throw new ResourceNotFoundError();
+    //     }
 
-        return reimbs;
-    }
+    //     return reimbs;
+    // }
 
     async getReimbById(id: number): Promise<Reimbursement> {
         
@@ -78,7 +78,7 @@ export class ReimbService {
         return reimb;
     }
 
-    async getReimbByAuthorId(id: number): Promise<Reimbursement> {
+    async getReimbByAuthorId(id: number): Promise<Reimbursement[]> {
         
         if (!isValidId(id)) {
             throw new BadRequestError();
@@ -138,8 +138,23 @@ export class ReimbService {
         if (!queryKeys.every(key => isPropertyOf(key, Reimbursement))) {
             throw new BadRequestError();
         }
+
+        if(updateReimb.amount <= 0){
+            throw new BadRequestError('You need to provide a positive non-zero value.')
+        }
+
+        if(!isValidStrings(updateReimb.description)){
+            throw new BadRequestError('You need to provide a description.')
+        }
         
-        if(updateReimb.status !== 'Pending'){
+        let reimbTypes = await this.reimbRepo.getTypes();
+        if(!reimbTypes.includes(updateReimb.reimbType)){
+            throw new BadRequestError('Type not valid');
+        }
+
+        let reimb = await this.reimbRepo.getById(updateReimb.reimbId);
+
+        if(reimb.status !== 'Pending'){
             throw new ResourcePersistenceError('The Reimbursement was already processed.');
         }
 
@@ -150,6 +165,18 @@ export class ReimbService {
 
         if(resolvedReimb.status === 'Pending'){
             throw new ResourcePersistenceError('Can only be updated to Denied or Approved');
+        }
+
+        if(!isValidStrings(resolvedReimb.status)){
+            throw new BadRequestError('Invalid status input.');
+        }
+
+        if(resolvedReimb.status !== 'Approved' && resolvedReimb.status !== 'Denied'){
+            throw new BadRequestError('Invalid status input.');
+        }
+
+        if(!isValidStrings(resolvedReimb.resolver)){
+            throw new BadRequestError('Invalid username input.');
         }
 
         return await this.reimbRepo.resolve(resolvedReimb);

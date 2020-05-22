@@ -21,33 +21,33 @@ ReimbRouter.get('/fm', fmGuard, async (req, resp) => {
     }
 });
 
-/**
- * Get Reimbursements by Status(Only visible to finance manager)
- */
-ReimbRouter.get('/fm/status/:status', fmGuard, async (req, resp) => {
-    const status = req.params.status;
-    console.log(status);
-    try {
+// /**
+//  * Get Reimbursements by Status(Only visible to finance manager)
+//  */
+// ReimbRouter.get('/fm/status/:status', fmGuard, async (req, resp) => {
+//     const status = req.params.status;
+//     console.log(status);
+//     try {
 
-        let payload = await reimbService.getReimbByStatus(status);
-        return resp.status(200).json(payload);
-    } catch (e) {
-        return resp.status(e.statusCode).json(e);
-    }
-});
+//         let payload = await reimbService.getReimbByStatus(status);
+//         return resp.status(200).json(payload);
+//     } catch (e) {
+//         return resp.status(e.statusCode).json(e);
+//     }
+// });
 
-/**
- * Get Reimbursements by Type(Only visible to finance manager)
- */
-ReimbRouter.get('/fm/type/:type', fmGuard, async (req, resp) => {
-    const type = req.params.type;
-    try {
-        let payload = await reimbService.getReimbByType(type);
-        return resp.status(200).json(payload);
-    } catch (e) {
-        return resp.status(e.statusCode).json(e);
-    }
-});
+// /**
+//  * Get Reimbursements by Type(Only visible to finance manager)
+//  */
+// ReimbRouter.get('/fm/type/:type', fmGuard, async (req, resp) => {
+//     const type = req.params.type;
+//     try {
+//         let payload = await reimbService.getReimbByType(type);
+//         return resp.status(200).json(payload);
+//     } catch (e) {
+//         return resp.status(e.statusCode).json(e);
+//     }
+// });
 
 /**
  * Resolve Reimbursements (Only visible to Finance managers)
